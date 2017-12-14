@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+
+		<title>Code coverage: current status</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Code coverage: current status</h1>
+					<img src="coverage.jpg">
+					<p>
+						<small>Marco Castelluccio</small>
+					</p>
+				</section>
+
+				<section>
+					<h2>Codecov.io</h2>
+					<p>Overall navigable report of Linux + Windows code coverage:</p>
+					<p><a href="https://codecov.io/gh/marco-c/gecko-dev" target="_blank">https://codecov.io/gh/marco-c/gecko-dev</a></p>
+				</section>
+
+				<section>
+					<img src="screen-codecov1.png">
+				</section>
+
+				<section>
+					<img src="screen-codecov2.png">
+				</section>
+
+				<section>
+					<h2>Code coverage addon</h2>
+					<ul>
+						<li><b>DXR</b> integration, with coverage overlay;</li>
+						<li><b>Searchfox</b> integration, with coverage overlay;</li>
+						<li><b>Bugzilla</b> integration, with coverage information about landed patches.</li>
+					</ul>
+				</section>
+
+				<section>
+					<img src="screen-dxr.png">
+				</section>
+
+				<section>
+					<img src="screen-bugzilla.png">
+				</section>
+
+				<section>
+					<h2>List of patches and their coverage</h2>
+					<p><a href="https://firefox-code-coverage.herokuapp.com/" target="_blank">https://firefox-code-coverage.herokuapp.com/</a></p>
+				</section>
+
+				<section>
+					<img src="screen-diff-viewer.png">
+				</section>
+
+				<section>
+					<h2>Zero coverage report</h2>
+					<ul>
+						<li>Which files are no longer tested because they are no longer used and can be removed?</li>
+						<li>Which files are completely untested but should be?</li>
+					</ul>
+					<p><a href="https://marco-c.github.io/code-coverage-reports/" target="_blank">https://marco-c.github.io/code-coverage-reports/</a></p>
+					<p>With a short and random usage of the report Sylvestre and I were able to remove ~50 files with ~12000 lines of code.</p>
+				</section>
+
+				<section>
+					<h2>How to build a local coverage build or a try coverage build</h2>
+					<p><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Testing/Measuring_Code_Coverage_on_Firefox">https://developer.mozilla.org/en-US/docs/Mozilla/Testing/Measuring_Code_Coverage_on_Firefox</a></p>
+				</section>
+
+				<section>
+					<h2>Local coverage build on Linux</h2>
+					<pre><code data-trim class="python">
+# Enable code coverage
+ac_add_options --enable-coverage
+export CFLAGS="--coverage"
+export CXXFLAGS="--coverage"
+export LDFLAGS="--coverage"
+
+# Without debug mode, content processes terminate with "_exit",
+# which doesn't update coverage counters.
+ac_add_options --enable-debug
+# With the sandbox, content processes can't write updated coverage
+# counters in the gcda files.
+ac_add_options --disable-sandbox
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Local coverage build on Windows</h2>
+					<pre><code data-trim class="python">
+# Enable code coverage
+ac_add_options --enable-coverage
+export CC="clang-cl.exe"
+export CXX="clang-cl.exe"
+export CFLAGS="--coverage"
+export CXXFLAGS="--coverage"
+# Currently need a custom Clang build
+export LDFLAGS="PATH_TO_LLVM_BUILD_DIR/lib/clang/6.0.0/lib/windows/clang_rt.profile-x86_64.lib"
+
+# Without debug mode, content processes terminate with "_exit",
+# which doesn't update coverage counters.
+ac_add_options --enable-debug
+# With the sandbox, content processes can't write updated coverage
+# counters in the gcda files.
+ac_add_options --disable-sandbox
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Try coverage build</h2>
+					Linux:
+					<pre><code data-trim class="bash">
+./mach try fuzzy -q 'linux64-ccov'
+					</code></pre>
+					Windows:
+					<pre><code data-trim class="bash">
+./mach try fuzzy -q 'win64-ccov'
+					</code></pre>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+		<script>
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
